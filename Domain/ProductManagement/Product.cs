@@ -1,14 +1,15 @@
-﻿using System;
+﻿using OOPDesign.Domain.General;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace OOPDesign
+namespace OOPDesign.Domain.ProductManagement
 {
-    public class Product
+    public partial class Product
     {
-        public Product(int id, string name) 
+        public Product(int id, string name)
         {
             Name = name;
             Id = id;
@@ -18,16 +19,19 @@ namespace OOPDesign
         {
         }
 
-        public Product(int id, string name, string? description, UnitType unitType, int maxAmountInStock)
+        public Product(int id, string name, string? description, UnitType unitType, int maxAmountInStock, Price price)
         {
             maxItemsInStock = maxAmountInStock;
             UnitType = unitType;
             Id = id;
             Name = name;
             Description = description;
+            Price = price;
 
             UpdateLowStock();
-        }   
+        }
+
+        public Price Price { get; set; }
 
         private int id;
         private string name = string.Empty;
@@ -37,21 +41,21 @@ namespace OOPDesign
 
         public UnitType UnitType { get; set; }
 
-        public int AmountInStock { get;private set; }
+        public int AmountInStock { get; private set; }
 
         public bool IsBelowStockThreshold { get; private set; }
 
-        public int Id 
+        public int Id
         {
             get { return id; }
             set { id = value; }
-            
+
         }
         public string Name
         {
             get { return name; }
-            set 
-            { 
+            set
+            {
                 name = value.Length > 50 ? value[..50] : value;
             }
         }
@@ -61,7 +65,7 @@ namespace OOPDesign
             get { return description; }
             set
             {
-                if(value == null)
+                if (value == null)
                 {
                     description = string.Empty;
                 }
@@ -74,7 +78,7 @@ namespace OOPDesign
 
         public void UseProduct(int items)
         {
-            if(items <= AmountInStock)
+            if (items <= AmountInStock)
             {
                 AmountInStock -= items;
 
@@ -97,7 +101,7 @@ namespace OOPDesign
         {
             int newStock = AmountInStock + amount;
 
-            if( newStock < maxItemsInStock )
+            if (newStock < maxItemsInStock)
             {
                 AmountInStock += amount;
             }
@@ -107,7 +111,7 @@ namespace OOPDesign
                 Log($"{CreateSimpleProductRepresentation} stock overflow. {newStock - AmountInStock} item(s) ordered that couldnt be stored.");
             }
 
-            if(AmountInStock > 10)
+            if (AmountInStock > 10)
             {
                 IsBelowStockThreshold = false;
             }
@@ -115,7 +119,7 @@ namespace OOPDesign
 
         private void DecreaseStock(int items, string reason)
         {
-            if(items <= AmountInStock)
+            if (items <= AmountInStock)
             {
                 AmountInStock -= items;
             }
@@ -125,32 +129,16 @@ namespace OOPDesign
             }
         }
 
-        public void UpdateLowStock()
-        {
-            if(AmountInStock <= 10)
-            {
-                IsBelowStockThreshold = true;
-            }
-        }
-        public string CreateSimpleProductRepresentation()
-        {
-            return $"Product {id} ({name})";
-        }
-        private void Log(string message)
-        {
-            Console.WriteLine (message);
-        }
-
         public string DisplayDetailsShort()
         {
             return $"{id}. {name} \n{AmountInStock} items in stock";
         }
-        public string DisplayDetailsLong()
+        public string DisplayDetailsFull()
         {
             StringBuilder sb = new StringBuilder();
-            sb.Append($"{id} {name} \n{description}\n{AmountInStock} item(s) in stock");
+            sb.Append($"{id} {name} \n{description}\n{Price}\n{AmountInStock} item(s) in stock");
 
-            if(IsBelowStockThreshold)
+            if (IsBelowStockThreshold)
             {
                 sb.Append("\n!!STOCK LOW!!");
             }
@@ -158,11 +146,11 @@ namespace OOPDesign
             return sb.ToString();
         }
 
-        public string DisplayDetailsLong(string extraDetails)
+        public string DisplayDetailsFull(string extraDetails)
         {
             StringBuilder sb = new StringBuilder();
-            sb.Append($"{id} {name} \n{description}\n{AmountInStock} item(s) in stock");
-            sb.Append (extraDetails);   
+            sb.Append($"{id} {name} \n{description}\n{Price}\n{AmountInStock} item(s) in stock");
+            sb.Append(extraDetails);
 
             if (IsBelowStockThreshold)
             {
